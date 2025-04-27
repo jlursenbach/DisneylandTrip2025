@@ -1,116 +1,151 @@
 // priorities.js
+const top5Wrapper = document.getElementById('top5Wrapper');
+let top5Lists = JSON.parse(localStorage.getItem('top5Lists')) || [];
 
-let attractionData = {};
-let peopleList = []; // local tracking array
+async function loadChoices() {
+  const response = await fetch('../assets/choices.json');
+  return response.json();
+}
 
-// Load the choices.json database first
-fetch('../assets/choices.json')
-  .then(response => response.json())
-  .then(data => {
-    attractionData = data;
-    loadPeopleFromStorage();
-  })
-  .catch(error => {
-    console.error('Error loading attractions list:', error);
-  });
+function saveToLocalStorage() {
+  localStorage.setItem('top5Lists', JSON.stringify(top5Lists));
+}
 
-const peopleLists = document.getElementById('people-lists');
-const addPersonBtn = document.getElementById('add-person');
+function createPersonCard(person) {
+  const card = document.createElement('div');
+  card.className = 'card person-card';
+  card.dataset.name = person.name;
 
-// Add Person button logic
-addPersonBtn.addEventListener('click', () => {
-  const name = prompt("What's your name?");
-  if (!name) return;
-  createPersonSection(name);
-  peopleList.push(name);
-  savePeopleToStorage();
-});
-
-// Function to create a new person's Top-5 section
-function createPersonSection(name) {
-  const personDiv = document.createElement('div');
-  personDiv.classList.add('card', 'mt-1');
-  personDiv.dataset.name = name;
-
-  const details = document.createElement('details');
-  details.open = true;
-
-  const summary = document.createElement('summary');
-  summary.innerHTML = `<strong>${name}'s Must-Dos</strong>`;
+  const header = document.createElement('h3');
+  header.textContent = `${person.name}'s Must-Dos`;
+  card.appendChild(header);
 
   const removeBtn = document.createElement('button');
-  removeBtn.textContent = '❌ Remove';
-  removeBtn.style.marginLeft = '1rem';
-  removeBtn.className = 'btn-remove';
-  removeBtn.addEventListener('click', (e) => {
-    e.preventDefault();
-    removePerson(name);
-  });
+  removeBtn.textContent = '✖';
+  removeBtn.className = 'remove-btn';
+  removeBtn.onclick = () => removePerson(person.name);
+  card.appendChild(removeBtn);
 
-  summary.appendChild(removeBtn);
-  details.appendChild(summary);
+  const table = document.createElement('table');
 
-  const form = document.createElement('div');
-  form.classList.add('top5-form');
-
-  for (let i = 1; i <= 5; i++) {
-    const slot = document.createElement('div');
-    slot.classList.add('top5-slot');
+  // Create Top 5 rows
+  for (let i = 0; i < 5; i++) {
+    const tr = document.createElement('tr');
+    const td = document.createElement('td');
 
     const categorySelect = document.createElement('select');
-    categorySelect.innerHTML = `<option value="">Pick Category...</option>`;
-    Object.keys(attractionData).forEach(category => {
-      categorySelect.innerHTML += `<option value="${category}">${category}</option>`;
-    });
+    categorySelect.className = 'category-select';
+    categorySelect.innerHTML = '<option value="">Choose Category</option>';
 
-    const attractionSelect = document.createElement('select');
-    attractionSelect.innerHTML = `<option value="">Pick Attraction...</option>`;
-    attractionSelect.disabled = true;
+    const choiceSelect = document.createElement('select');
+    choiceSelect.className = 'choice-select';
+    choiceSelect.innerHTML = '<option value="">Choose Attraction</option>';
 
-    categorySelect.addEventListener('change', () => {
-      const selectedCategory = categorySelect.value;
-      if (selectedCategory && attractionData[selectedCategory]) {
-        attractionSelect.disabled = false;
-        attractionSelect.innerHTML = `<option value="">Pick Attraction...</option>`;
-        attractionData[selectedCategory].forEach(attraction => {
-          attractionSelect.innerHTML += `<option value="${attraction}">${attraction}</option>`;
-        });
-      } else {
-        attractionSelect.disabled = true;
-        attractionSelect.innerHTML = `<option value="">Pick Attraction...</option>`;
-      }
-    });
-
-    slot.appendChild(categorySelect);
-    slot.appendChild(attractionSelect);
-    form.appendChild(slot);
+    td.appendChild(categorySelect);
+    td.appendChild(choiceSelect);
+    tr.appendChild(td);
+    table.appendChild(tr);
   }
+  card.appendChild(table);
+  top5Wrapper.appendChild(card);
 
-  details.appendChild(form);
-  personDiv.appendChild(details);
-  peopleLists.appendChild(personDiv);
+  populateCategories(card);
+  if (person.choices) populatePersonChoices(card, person.choices);
 }
 
-// Save the list of people to LocalStorage
-function savePeopleToStorage() {
-  localStorage.setItem('peopleList', JSON.stringify(peopleList));
-}
+function populateCategories(card) {
+  loadChoices().then(data => {
+    const categorySelects = card.querySelectorAll('.category-select');
+    categorySelects.forEach(catSel => {
+      catSel.innerHTML = '<option value="">Choose Category</option>';
+      Object.keys(data).forEach(category => {
+        const option = document.createElement('option');
+        option.value = category;
+        option.textContent = category;
+        catSel.appendChild(option);
+      });
 
-// Load the people from LocalStorage when page loads
-function loadPeopleFromStorage() {
-  const storedPeople = JSON.parse(localStorage.getItem('peopleList')) || [];
-  storedPeople.forEach(name => {
-    createPersonSection(name);
+      catSel.onchange = function() {
+        const selectedCategory = this.value;
+        const choiceSelect = this.nextElementSibling;
+        choiceSelect.innerHTML = '<option value="">Choose Attraction</option>';
+        if (data[selectedCategory]) {
+          data[selectedCategory].forEach(choice => {
+            const opt = document.createElement('option');
+            opt.value = choice;
+            opt.textContent = choice;
+            choiceSelect.appendChild(opt);
+          });
+        }
+        savePersonChoices();
+      };
+    });
+
+    const choiceSelects = card.querySelectorAll('.choice-select');
+    choiceSelects.forEach(sel => {
+      sel.onchange = savePersonChoices;
+    });
   });
-  peopleList = storedPeople;
 }
 
-// Remove a person
-function removePerson(name) {
-  const personDiv = document.querySelector(`[data-name="${name}"]`);
-  if (personDiv) {
-    personDiv.remove();
-  }
-  peopleList = peopleList.filter(person => person !== name);
-  savePeopleToStorage();
+function savePersonChoices() {
+  const allCards = document.querySelectorAll('.person-card');
+  top5Lists = [];
+
+  allCards.forEach(card => {
+    const person = {
+      name: card.dataset.name,
+      choices: []
+    };
+    const rows = card.querySelectorAll('table tr');
+    rows.forEach(row => {
+      const cat = row.querySelector('.category-select')?.value || '';
+      const choice = row.querySelector('.choice-select')?.value || '';
+      person.choices.push({ category: cat, attraction: choice });
+    });
+    top5Lists.push(person);
+  });
+
+  saveToLocalStorage();
 }
+
+function populatePersonChoices(card, choices) {
+  const rows = card.querySelectorAll('table tr');
+  choices.forEach((choice, idx) => {
+    if (rows[idx]) {
+      const catSel = rows[idx].querySelector('.category-select');
+      const choiceSel = rows[idx].querySelector('.choice-select');
+      if (catSel && choiceSel) {
+        catSel.value = choice.category;
+        catSel.dispatchEvent(new Event('change'));
+        setTimeout(() => {
+          choiceSel.value = choice.attraction;
+        }, 100); // slight delay to allow populate
+      }
+    }
+  });
+}
+
+function removePerson(name) {
+  const card = document.querySelector(`.person-card[data-name="${name}"]`);
+  if (card) card.remove();
+  top5Lists = top5Lists.filter(p => p.name !== name);
+  saveToLocalStorage();
+}
+
+function addNewPerson() {
+  const name = prompt('Enter your name:');
+  if (!name) return;
+  if (top5Lists.find(p => p.name === name)) {
+    alert('That name already exists!');
+    return;
+  }
+  const person = { name: name, choices: [] };
+  top5Lists.push(person);
+  saveToLocalStorage();
+  createPersonCard(person);
+}
+
+// --- On page load ---
+top5Lists.forEach(createPersonCard);
+document.getElementById('addPersonBtn').onclick = addNewPerson;
