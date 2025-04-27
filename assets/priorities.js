@@ -1,14 +1,13 @@
 // priorities.js
+
 const top5Wrapper = document.getElementById('top5Wrapper');
-let top5Lists = JSON.parse(localStorage.getItem('top5Lists')) || [];
+let top5Lists = []; // no longer relying on localStorage — will POST to cloud
+
+const WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbwWWU4vrpkUSMP4zHWZy67D1kkcg87SQ8Qttuu5UaZA7qsHP7_RBsSJGGMT0JlwxuU9/exec'; // <<< REPLACE THIS with your real Web App URL
 
 async function loadChoices() {
   const response = await fetch('../assets/choices.json');
   return response.json();
-}
-
-function saveToLocalStorage() {
-  localStorage.setItem('top5Lists', JSON.stringify(top5Lists));
 }
 
 function createPersonCard(person) {
@@ -28,7 +27,6 @@ function createPersonCard(person) {
 
   const table = document.createElement('table');
 
-  // Create Top 5 rows
   for (let i = 0; i < 5; i++) {
     const tr = document.createElement('tr');
     const td = document.createElement('td');
@@ -49,14 +47,15 @@ function createPersonCard(person) {
   card.appendChild(table);
   top5Wrapper.appendChild(card);
 
-  populateCategories(card);
-  if (person.choices) populatePersonChoices(card, person.choices);
+  populateCategories(card, person.name);
 }
 
-function populateCategories(card) {
+function populateCategories(card, personName) {
   loadChoices().then(data => {
     const categorySelects = card.querySelectorAll('.category-select');
-    categorySelects.forEach(catSel => {
+    const choiceSelects = card.querySelectorAll('.choice-select');
+
+    categorySelects.forEach((catSel, idx) => {
       catSel.innerHTML = '<option value="">Choose Category</option>';
       Object.keys(data).forEach(category => {
         const option = document.createElement('option');
@@ -67,85 +66,79 @@ function populateCategories(card) {
 
       catSel.onchange = function() {
         const selectedCategory = this.value;
-        const choiceSelect = this.nextElementSibling;
-        choiceSelect.innerHTML = '<option value="">Choose Attraction</option>';
+        const choiceSelect = choiceSelects[idx];
+        choiceSelect.innerHTML = '<option value="">Choose Attraction...</option>';
+
         if (data[selectedCategory]) {
-          data[selectedCategory].forEach(choice => {
+          choiceSelect.disabled = false;
+          data[selectedCategory].forEach(attraction => {
             const opt = document.createElement('option');
-            opt.value = choice;
-            opt.textContent = choice;
+            opt.value = attraction;
+            opt.textContent = attraction;
             choiceSelect.appendChild(opt);
           });
+        } else {
+          choiceSelect.disabled = true;
         }
-        savePersonChoices();
       };
     });
 
-    const choiceSelects = card.querySelectorAll('.choice-select');
     choiceSelects.forEach(sel => {
-      sel.onchange = savePersonChoices;
+      sel.onchange = () => {
+        savePersonToSheet(personName);
+      };
     });
   });
 }
 
-function savePersonChoices() {
-  const allCards = document.querySelectorAll('.person-card');
-  top5Lists = [];
+function savePersonToSheet(personName) {
+  const personCard = document.querySelector(`.person-card[data-name="${personName}"]`);
+  if (!personCard) return;
 
-  allCards.forEach(card => {
-    const person = {
-      name: card.dataset.name,
-      choices: []
-    };
-    const rows = card.querySelectorAll('table tr');
-    rows.forEach(row => {
-      const cat = row.querySelector('.category-select')?.value || '';
-      const choice = row.querySelector('.choice-select')?.value || '';
-      person.choices.push({ category: cat, attraction: choice });
-    });
-    top5Lists.push(person);
+  const rows = personCard.querySelectorAll('table tr');
+  const choices = [];
+
+  rows.forEach(row => {
+    const cat = row.querySelector('.category-select')?.value || '';
+    const choice = row.querySelector('.choice-select')?.value || '';
+    choices.push({ category: cat, attraction: choice });
   });
 
-  saveToLocalStorage();
-}
-
-function populatePersonChoices(card, choices) {
-  const rows = card.querySelectorAll('table tr');
-  choices.forEach((choice, idx) => {
-    if (rows[idx]) {
-      const catSel = rows[idx].querySelector('.category-select');
-      const choiceSel = rows[idx].querySelector('.choice-select');
-      if (catSel && choiceSel) {
-        catSel.value = choice.category;
-        catSel.dispatchEvent(new Event('change'));
-        setTimeout(() => {
-          choiceSel.value = choice.attraction;
-        }, 100); // slight delay to allow populate
-      }
+  fetch(WEB_APP_URL, {
+    method: 'POST',
+    body: JSON.stringify({
+      name: personName,
+      choice1: choices[0]?.attraction || '',
+      choice2: choices[1]?.attraction || '',
+      choice3: choices[2]?.attraction || '',
+      choice4: choices[3]?.attraction || '',
+      choice5: choices[4]?.attraction || ''
+    }),
+    headers: {
+      'Content-Type': 'application/json'
     }
-  });
+  })
+  .then(res => res.json())
+  .then(data => console.log('Saved to Sheet:', data))
+  .catch(err => console.error('Error saving:', err));
 }
 
 function removePerson(name) {
   const card = document.querySelector(`.person-card[data-name="${name}"]`);
   if (card) card.remove();
-  top5Lists = top5Lists.filter(p => p.name !== name);
-  saveToLocalStorage();
 }
 
 function addNewPerson() {
   const name = prompt('Enter your name:');
   if (!name) return;
-  if (top5Lists.find(p => p.name === name)) {
+  if (document.querySelector(`.person-card[data-name="${name}"]`)) {
     alert('That name already exists!');
     return;
   }
+
   const person = { name: name, choices: [] };
-  top5Lists.push(person);
-  saveToLocalStorage();
   createPersonCard(person);
 }
 
 // --- On page load ---
-top5Lists.forEach(createPersonCard);
 document.getElementById('add-person').onclick = addNewPerson;
