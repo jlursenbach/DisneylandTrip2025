@@ -38,9 +38,8 @@ a:hover { color: var(--accent-dark); }
 /* ---------- Hero banner ---------- */
 .hero {
   width: 100%;
-  height: 300px;
-  background: url('https://images-wixmp-ed30a86b8c4ca887773594c2.wixmp.com/f/b742a6d9-30d1-449e-8b13-b357804bd43b/der32n6-b64cb047-cd94-4881-9036-fa0e9064ce79.png')
-             center/cover no-repeat;
+  height: 200px;
+  background: url('../assets/disney_castle_happy.jpg') center/cover no-repeat;
   display: flex;
   align-items: center;
   justify-content: center;
