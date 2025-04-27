@@ -160,3 +160,18 @@ body{
   background-color:#111417;
   background-blend-mode:overlay;
 }
+
+/* Remove button on cards */
+.remove-btn {
+  background: transparent;
+  border: none;
+  color: #ff6b6b;
+  font-size: 1.3rem;
+  position: absolute;
+  bottom: 8px;
+  right: 12px;
+  cursor: pointer;
+}
+.remove-btn:hover {
+  color: #ff3333;
+}
