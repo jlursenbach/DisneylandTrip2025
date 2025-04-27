@@ -1,163 +1,163 @@
-/* Disney Family Trip — master stylesheet */
+/* Disney Family Trip — master stylesheet 2025 */
 
 /* ---------- Color & design tokens ---------- */
-:root {
+:root{
   /* Disney palette */
-  --primary: #e6232e;      /* Mickey red */
-  --accent:  #f9d23c;      /* Disney yellow */
-  --accent-dark: #d9b32f;
-  --bg:      #f9f9fb;
-  --card:    #ffffff;
-  --text:    #333;
-  --radius:  12px;
-  --shadow:  0 4px 14px rgb(0 0 0 / .06);
+  --primary:#e6232e;               /* Mickey red */
+  --accent:#f9d23c;                /* Disney yellow */
+  --accent-dark:#d9b32f;
+  --bg:#f9f9fb;
+  --card:#ffffff;
+  --text:#333;
+  --radius:12px;
+  --shadow:0 4px 14px rgb(0 0 0 / .06);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --bg:   #111417;
-    --card: #1d2024;
-    --text: #e2e2e5;
-    --shadow: 0 4px 14px rgb(0 0 0 / .5);
+@media(prefers-color-scheme:dark){
+  :root{
+    --bg:#111417;
+    --card:#1d2024;
+    --text:#e2e2e5;
+    --shadow:0 4px 14px rgb(0 0 0 / .5);
   }
 }
 
 /* ---------- Base ---------- */
-html, body {
-  margin: 0;
-  font-family: system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
-  background: var(--bg);
-  color: var(--text);
-  line-height: 1.55;
+html,body{
+  margin:0;
+  font-family:system-ui,-apple-system,Segoe UI,Roboto,sans-serif;
+  background:var(--bg);
+  color:var(--text);
+  line-height:1.55;
 }
 
 /* ---------- Links ---------- */
-a { color: var(--accent); text-decoration: none; font-weight: 600; }
-a:hover { color: var(--accent-dark); }
+a{color:var(--accent);text-decoration:none;font-weight:600;}
+a:hover{color:var(--accent-dark);}
 
 /* ---------- Hero banner ---------- */
-.hero {
-  width: 100%;
-  height: 200px;
-  background: url('../assets/disney_castle_happy.jpg') center/cover no-repeat;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  position: relative;
+.hero{
+  width:100%;
+  height:200px;                                         /* slimmer banner */
+  background:url('../assets/disney_castle_happy.jpg') center/cover no-repeat;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  position:relative;
 }
-.hero-overlay {
-  background: rgba(0, 0, 0, 0.35);
-  padding: .8rem 1.4rem;
-  border-radius: var(--radius);
+.hero-overlay{
+  background:rgba(0,0,0,.35);                          /* contrast tint */
+  padding:.8rem 1.4rem;
+  border-radius:var(--radius);
 }
-.hero h1 {
-  font-family: "Bangers", cursive;
-  font-size: clamp(2.6rem, 5vw, 4rem);
-  color: #fff;
-  text-shadow: 2px 2px 8px #00000090;
-  margin: 0;
+.hero h1{
+  font-family:"Bangers",cursive;
+  font-size:clamp(2.4rem,5vw,3.6rem);
+  color:#fff;
+  text-shadow:2px 2px 8px #00000090;
+  margin:0;
 }
 
 /* ---------- Sticky navigation ---------- */
-.main-nav {
-  display: flex;
-  justify-content: center;
-  flex-wrap: wrap;
-  gap: 0.8rem;
-  background: #1d1d1f;
-  padding: 0.8rem 1rem;
-  position: sticky;
-  top: 0;
-  z-index: 99;
-  box-shadow: 0 2px 8px rgb(0 0 0 / .4);
+.main-nav{
+  display:flex;
+  justify-content:center;
+  flex-wrap:wrap;
+  gap:.8rem;
+  background:#1d1d1f;
+  padding:.8rem 1rem;
+  position:sticky;
+  top:0;
+  z-index:99;
+  box-shadow:0 2px 8px rgb(0 0 0 /.4);
 }
-.main-nav a {
-  color: var(--accent);
-  transition: color 0.2s;
+.main-nav a{
+  color:var(--accent);
+  transition:color .2s;
 }
-.main-nav a:hover { color: var(--accent-dark); }
+.main-nav a:hover{color:var(--accent-dark);}
 
 /* ---------- Layout helpers ---------- */
-.container { max-width: 1000px; margin: 2.5rem auto; padding: 0 1rem; }
-section   { margin: 3rem 0; }
-section h2 {
-  font-size: 1.7rem;
-  margin-bottom: 1rem;
-  font-weight: 700;
-  position: relative;
+.container{max-width:1000px;margin:2.5rem auto;padding:0 1rem;}
+section{margin:3rem 0;}
+section h2{
+  font-size:1.7rem;
+  margin-bottom:1rem;
+  font-weight:700;
+  position:relative;
 }
-section h2::after {
-  content: "";
-  display: block;
-  width: 64px;
-  height: 3px;
-  background: var(--accent);
-  margin-top: 0.5rem;
-  border-radius: 3px;
+section h2::after{
+  content:"";
+  display:block;
+  width:64px;
+  height:3px;
+  background:var(--accent);
+  margin-top:.5rem;
+  border-radius:3px;
 }
 
 /* ---------- Cards ---------- */
-.grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-  gap: 1.4rem;
+.grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(240px,1fr));
+  gap:1.4rem;
 }
-.card {
-  background: var(--card);
-  border-radius: var(--radius);
-  padding: 1.2rem;
-  box-shadow: var(--shadow);
-  position: relative;
-  overflow: hidden;
-  transition: transform 0.3s, box-shadow 0.3s;
+.card{
+  background:var(--card);
+  border-radius:var(--radius);
+  padding:1.2rem;
+  box-shadow:var(--shadow);
+  position:relative;
+  overflow:hidden;
+  transition:transform .3s,box-shadow .3s;
 }
-.card:hover {
-  transform: translateY(-6px) scale(1.02);
-  box-shadow: 0 8px 20px rgba(255,255,255,.12);
+.card:hover{
+  transform:translateY(-6px) scale(1.02);
+  box-shadow:0 8px 20px rgba(255,255,255,.12);
 }
 
 /* Sparkle hover */
-.card::after {
-  content: '✨';
-  position: absolute;
-  top: -12px;
-  right: -12px;
-  font-size: 1.9rem;
-  color: var(--accent);
-  opacity: 0;
-  pointer-events: none;
-  transform: rotate(10deg) scale(.8);
-  transition: opacity .5s ease, transform .5s ease;
-  animation: sparkle-move 2.5s infinite alternate ease-in-out;
+.card::after{
+  content:'✨';
+  position:absolute;
+  top:-12px;
+  right:-12px;
+  font-size:1.9rem;
+  color:var(--accent);
+  opacity:0;
+  pointer-events:none;
+  transform:rotate(10deg) scale(.8);
+  transition:opacity .5s ease,transform .5s ease;
+  animation:sparkle-move 2.5s infinite alternate ease-in-out;
 }
-.card:hover::after {
-  opacity: 1;
-  transform: rotate(0deg) scale(1.15);
+.card:hover::after{
+  opacity:1;
+  transform:rotate(0deg) scale(1.15);
 }
-@keyframes sparkle-move {
-  0%   { top: -12px; right: -12px; transform: rotate(0deg) scale(.85); }
-  50%  { top: -16px; right: -8px;  transform: rotate(18deg) scale(1); }
-  100% { top: -12px; right: -6px;  transform: rotate(-10deg) scale(.9); }
+@keyframes sparkle-move{
+  0%  {top:-12px;right:-12px;transform:rotate(0deg)  scale(.85);}
+  50% {top:-16px;right:-8px; transform:rotate(18deg) scale(1);}
+  100%{top:-12px;right:-6px; transform:rotate(-10deg)scale(.9);}
 }
 
 /* ---------- Tables ---------- */
-.table-wrap { overflow-x: auto; }
-table      { width: 100%; border-collapse: collapse; font-size: 0.92rem; }
-th, td     { border: 1px solid #dcdcdc; padding: 0.55rem; text-align: left; }
-th         { background: #f1f1f1; font-weight: 600; }
-@media (prefers-color-scheme: dark) {
-  th         { background:#202225; border-color:#2b2d31; }
-  th, td     { border-color:#2b2d31; }
+.table-wrap{overflow-x:auto;}
+table{width:100%;border-collapse:collapse;font-size:.92rem;}
+th,td{border:1px solid #dcdcdc;padding:.55rem;text-align:left;}
+th{background:#f1f1f1;font-weight:600;}
+@media(prefers-color-scheme:dark){
+  th{background:#202225;border-color:#2b2d31;}
+  th,td{border-color:#2b2d31;}
 }
 
 /* ---------- Utilities ---------- */
-.text-center { text-align: center; }
-.mt-1        { margin-top: 1rem; }
+.text-center{text-align:center;}
+.mt-1{margin-top:1rem;}
 
 /* ---------- Magical full-page background ---------- */
-body {
-  background: url('https://images.unsplash.com/photo-1500051638674-ff996a0ec29e?auto=format&fit=crop&w=2400&q=80')
-              center/cover fixed no-repeat;
-  background-color: #111417;
-  background-blend-mode: overlay; /* darken for readability */
+body{
+  background:url('https://images.unsplash.com/photo-1500051638674-ff996a0ec29e?auto=format&fit=crop&w=2400&q=80')
+            center/cover fixed no-repeat;
+  background-color:#111417;
+  background-blend-mode:overlay;
 }
