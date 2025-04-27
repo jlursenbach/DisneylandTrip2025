@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Disney Trip • Top‑5 Priorities</title>
+  <link rel="stylesheet" href="../assets/style.css" />
+  <script defer src="priorities.js"></script>
+</head>
+<body>
+  <header>
+    <h1>⭐️ Pick Your Top‑5 Must‑Dos</h1>
+    <nav>
+      <a href="../home/">Home</a>
+      <a href="../itinerary/">Master Plan</a>
+      <a href="../videos/">Videos</a>
+    </nav>
+  </header>
+
+  <main class="container">
+    <section>
+      <h2 class="text-center">Add or edit your list</h2>
+      <p class="text-center mt-1">Click <strong>“+ Add Me”</strong> then type your top five attractions, snacks, or shows.</p>
+
+      <div class="table-wrap card" style="overflow-x:auto">
+        <table id="prio-table">
+          <thead>
+            <tr><th>Name</th><th>#1</th><th>#2</th><th>#3</th><th>#4</th><th>#5</th><th></th></tr>
+          </thead>
+          <tbody><!-- filled by JS / localStorage --></tbody>
+        </table>
+      </div>
+      <div class="text-center mt-1">
+        <button id="add-row" style="padding:.6rem 1.4rem;border:none;border-radius:var(--radius);background:var(--primary);color:#fff;font-weight:600;cursor:pointer">+ Add Me</button>
+      </div>
+    </section>
+  </main>
+</body>
+</html>
