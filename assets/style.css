@@ -1,1 +1,130 @@
+/* Disney Family Trip – shared styles */
+:root {
+  --primary: #ff6b6b;
+  --accent: #4f9ef7;
+  --bg: #f9f9fb;
+  --card: #ffffff;
+  --text: #333;
+  --radius: 12px;
+  --shadow: 0 4px 12px rgb(0 0 0 / .06);
+}
+
+html,
+body {
+  margin: 0;
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, Segoe UI, Roboto,
+    sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  line-height: 1.5;
+}
+
+/* Dark-mode palette */
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #101012;
+    --card: #1a1b1e;
+    --text: #e6e6e9;
+    --shadow: 0 4px 12px rgb(0 0 0 / 0.4);
+  }
+}
+
+/* Header + nav */
+header {
+  padding: 2.5rem 1rem 1rem;
+  text-align: center;
+  background: var(--card);
+  box-shadow: var(--shadow);
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+header h1 {
+  margin: 0.2rem 0;
+  font-size: clamp(1.8rem, 4vw, 2.6rem);
+}
+
+nav {
+  margin-top: 1rem;
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+nav a {
+  padding: 0.55rem 1rem;
+  border-radius: var(--radius);
+  background: var(--primary);
+  color: #fff;
+  font-weight: 600;
+  transition: background 0.2s;
+}
+nav a:hover {
+  background: #e85b5b;
+}
+
+/* Layout helpers */
+.container {
+  max-width: 960px;
+  margin: 2rem auto;
+  padding: 0 1rem;
+}
+section {
+  margin: 3rem 0;
+}
+section h2 {
+  font-size: 1.6rem;
+  margin-bottom: 1rem;
+  position: relative;
+}
+section h2::after {
+  content: '';
+  display: block;
+  width: 60px;
+  height: 3px;
+  background: var(--primary);
+  margin-top: 0.4rem;
+  border-radius: 3px;
+}
+
+/* Card grid */
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1rem;
+}
+.card {
+  background: var(--card);
+  border-radius: var(--radius);
+  padding: 1rem;
+  box-shadow: var(--shadow);
+}
+
+/* Table styling */
+.table-wrap {
+  overflow-x: auto;
+}
+.table-wrap table,
+table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.9rem;
+}
+th,
+td {
+  border: 1px solid #e0e0e0;
+  padding: 0.45rem;
+  text-align: left;
+}
+th {
+  background: #fafafa;
+}
+
+/* Utility classes */
+.text-center {
+  text-align: center;
+}
+.mt-1 {
+  margin-top: 1rem;
+}
 
