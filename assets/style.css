@@ -156,7 +156,7 @@ th{background:#f1f1f1;font-weight:600;}
 
 /* ---------- Magical full-page background ---------- */
 body{
-  background:url('../assets/disney_castle_happy.jpg') center/cover fixed no-repeat;
+  background:url('../assets/disney_background.jpg') center/cover fixed no-repeat;
   background-color:#111417;
   background-blend-mode:overlay;
 }
