@@ -1,6 +1,6 @@
 // priorities.js
 
-const top5Wrapper = document.getElementById('top5Wrapper');
+const top5Wrapper = document.getElementById('people-lists');
 let top5Lists = []; // no longer relying on localStorage — will POST to cloud
 
 const WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbwWWU4vrpkUSMP4zHWZy67D1kkcg87SQ8Qttuu5UaZA7qsHP7_RBsSJGGMT0JlwxuU9/exec'; // <<< REPLACE THIS with your real Web App URL
