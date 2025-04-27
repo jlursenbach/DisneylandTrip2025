@@ -21,7 +21,7 @@ body {
 
 /* Dark-mode palette */
 @media (prefers-color-scheme: dark) {
-  :root {
+  : root {
     --bg: #101012;
     --card: #1a1b1e;
     --text: #e6e6e9;
@@ -59,7 +59,7 @@ nav a {
   font-weight: 600;
   transition: background 0.2s;
 }
-nav a:hover {
+nav a: hover {
   background: #e85b5b;
 }
 
@@ -126,5 +126,16 @@ th {
 }
 .mt-1 {
   margin-top: 1rem;
+}
+
+/* --- link styling inside dark cards --- */
+.card a {
+  color: var(--accent);          /* blue in light-mode */
+}
+.card a: hover {
+  color: var(--primary);         /* red on hover */
+}
+@media (prefers-color-scheme: dark) {
+  .card a { color: #8ec1ff; }    /* lighter blue for contrast */
 }
 
