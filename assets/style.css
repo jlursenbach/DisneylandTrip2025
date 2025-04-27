@@ -127,3 +127,57 @@ th { background: #f1f1f1; font-weight: 600; }
 /* ---------- Utilities ---------- */
 .text-center { text-align: center; }
 .mt-1        { margin-top: 1rem; }
+
+/* Hero top banner */
+.hero {
+  width: 100%;
+  height: 300px;
+  background: url('https://images-wixmp-ed30a86b8c4ca887773594c2.wixmp.com/f/b742a6d9-30d1-449e-8b13-b357804bd43b/der32n6-b64cb047-cd94-4881-9036-fa0e9064ce79.png') center/cover no-repeat;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+}
+.hero-overlay {
+  background: rgba(0, 0, 0, 0.4); /* slight dark tint for contrast */
+  padding: 1rem 2rem;
+  border-radius: 12px;
+}
+.hero h1 {
+  font-family: "Bangers", cursive;
+  font-size: clamp(2.6rem, 5vw, 4rem);
+  color: #fff;
+  text-shadow: 2px 2px 8px #00000090;
+  margin: 0;
+}
+
+/* Sticky Nav */
+.main-nav {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  background: #1d1d1f;
+  padding: 0.8rem 1rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
+  position: sticky;
+  top: 0;
+  z-index: 99;
+}
+.main-nav a {
+  color: var(--accent);
+  text-decoration: none;
+  margin: 0 0.8rem;
+  font-weight: 600;
+  transition: color 0.2s;
+}
+.main-nav a:hover {
+  color: var(--accent-dark);
+}
+
+/* Full-page background */
+body {
+  background: url('https://wallpapers.com/images/high/disney-world-desktop-1920-x-1200-qq4lzeecsamuai22.webp') center/cover fixed no-repeat;
+  background-color: #111417; /* fallback color */
+  background-blend-mode: overlay;
+}
+
