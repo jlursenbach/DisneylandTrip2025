@@ -148,4 +148,4 @@ function addNewPerson() {
 
 // --- On page load ---
 top5Lists.forEach(createPersonCard);
-document.getElementById('addPersonBtn').onclick = addNewPerson;
+document.getElementById('add-person').onclick = addNewPerson;
