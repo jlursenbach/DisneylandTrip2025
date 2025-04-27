@@ -3,124 +3,29 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>🏰 Disney Fam Trip Planner</title>
-  <!-- Simple, self‑contained styling—easy to tweak later or split into /css/style.css -->
+  <title>🎆 Disney Family Trip 2025</title>
+  <link rel="stylesheet" href="assets/style.css" />
   <style>
-    :root {
-      --accent: #ff6b6b;
-      --bg: #f9f9fb;
-      --card: #ffffff;
-      --text: #333;
-      --radius: 14px;
-      --shadow: 0 4px 10px rgb(0 0 0 / .05);
+    /* Full‑screen splash overrides */
+    body,html {height:100%;margin:0}
+    .splash {
+      position:relative;
+      width:100%;height:100%;
+      background:url('assets/welcome.png') center/cover no-repeat fixed;
+      display:flex;align-items:center;justify-content:center;
+      cursor:pointer;
     }
-    html,body {margin:0;font-family:system-ui,-apple-system,BlinkMacSystemFont,sans-serif;background:var(--bg);color:var(--text);line-height:1.5;}
-    a {color:var(--accent);text-decoration:none}
-    header {padding:2.5rem 1rem 1rem;text-align:center;background:#fff;box-shadow:var(--shadow);position:sticky;top:0;z-index:10;}
-    header h1 {margin:.2rem 0;font-size:2.2rem}
-    nav {margin-top:1rem;display:flex;justify-content:center;flex-wrap:wrap;gap:1rem}
-    nav a {padding:.5rem 1rem;border-radius:var(--radius);background:var(--accent);color:#fff;font-weight:600;}
-    .container {max-width:960px;margin:2rem auto;padding:0 1rem}
-    section {margin:3rem 0}
-    section h2 {font-size:1.6rem;margin-bottom:1rem;position:relative}
-    section h2::after {content:"";display:block;width:60px;height:3px;background:var(--accent);margin-top:.4rem;border-radius:3px}
-    .grid {display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:1rem}
-    .card {background:var(--card);border-radius:var(--radius);padding:1rem;box-shadow:var(--shadow)}
-    table {width:100%;border-collapse:collapse;font-size:.9rem}
-    th,td {border:1px solid #e0e0e0;padding:.45rem}
-    th {background:#fafafa;text-align:left}
-    @media(max-width:600px){header h1{font-size:1.55rem}}
+    .splash h1 {
+      color:#fff;
+      font-size:clamp(2.4rem,5vw,4rem);
+      text-shadow:0 4px 12px rgb(0 0 0 /.6);
+      backdrop-filter:brightness(.9);
+    }
   </style>
 </head>
 <body>
-  <header>
-    <h1>🏰 Disney Family Trip Planning Hub</h1>
-    <p>Everything you need to prep for our upcoming one‑day Disneyland adventure.</p>
-    <nav>
-      <a href="#plan">Master Plan</a>
-      <a href="#priority">Top 5</a>
-      <a href="#videos">Videos</a>
-      <a href="#votes">Voting Hub</a>
-      <a href="#tips">Jacob’s Tips</a>
-      <a href="#chat">Chat</a>
-    </nav>
-  </header>
-
-  <div class="container">
-    <!-- Master Plan ------------------------------------------------------------>
-    <section id="plan">
-      <h2>📅 Master Plan (Timeline)</h2>
-      <p>Times are placeholders—Jacob will refine. When this is imported to Notion you can turn it into a database ➜ Timeline view.</p>
-      <div class="card">
-        <table>
-          <thead>
-            <tr><th>Start (ISO)</th><th>End</th><th>Activity</th><th>Location</th><th>Group</th><th>LL</th><th>Notes</th></tr>
-          </thead>
-          <tbody>
-            <tr><td>2025-08-01 06:45</td><td>07:05</td><td>Arrive Mickey & Friends parking</td><td>Garage</td><td>All</td><td></td><td>Remember row pic</td></tr>
-            <tr><td>2025-08-01 08:00</td><td>08:12</td><td>Pirates of the Caribbean</td><td>N.O. Square</td><td>All</td><td>SB</td><td>Walk‑on</td></tr>
-            <!-- more rows... -->
-          </tbody>
-        </table>
-      </div>
-    </section>
-
-    <!-- Top‑5 Priorities ------------------------------------------------------->
-    <section id="priority">
-      <h2>⭐️ Everyone’s Top‑5 Must‑Dos</h2>
-      <div class="card">
-        <table>
-          <thead><tr><th>Name</th><th>#1</th><th>#2</th><th>#3</th><th>#4</th><th>#5</th></tr></thead>
-          <tbody>
-            <tr><td>Jacob</td><td></td><td></td><td></td><td></td><td></td></tr>
-            <tr><td>Rosa</td><td></td><td></td><td></td><td></td><td></td></tr>
-            <!-- add family rows -->
-          </tbody>
-        </table>
-      </div>
-    </section>
-
-    <!-- Videos ---------------------------------------------------------------->
-    <section id="videos">
-      <h2>🎥 Hype Videos</h2>
-      <p>Paste a YouTube link below—GitHub Pages can’t auto‑embed but Notion will. For now we just link.</p>
-      <ul>
-        <li><a href="#">🔗 Example: Defunctland – History of Haunted Mansion</a></li>
-      </ul>
-    </section>
-
-    <!-- Voting Hub ------------------------------------------------------------>
-    <section id="votes">
-      <h2>🗳 Decision Voting Hub</h2>
-      <p>Topics we need to settle. Use 👍 reactions in Notion or GitHub issues if hosted here.</p>
-      <div class="card">
-        <table>
-          <thead><tr><th>Topic</th><th>Description</th><th>Status</th></tr></thead>
-          <tbody>
-            <tr><td>Parade time</td><td>3:30 vs 6:30 showing</td><td>Open</td></tr>
-          </tbody>
-        </table>
-      </div>
-    </section>
-
-    <!-- Tips ------------------------------------------------------------------>
-    <section id="tips">
-      <h2>💡 Jacob’s Pixie‑Dust Corner</h2>
-      <div class="grid">
-        <div class="card"><strong>Flag Retreat</strong><br/>Ask City Hall by 4 p.m. for veteran participation.</div>
-        <div class="card"><strong>Mark Twain Wheelhouse</strong><br/>Arrive 10 min early, request the captain’s cabin.</div>
-        <div class="card"><strong>Death Certificate</strong><br/>Politely ask a Mansion host after you exit.</div>
-      </div>
-    </section>
-
-    <!-- Chat ------------------------------------------------------------------>
-    <section id="chat">
-      <h2>💬 Planning Chat</h2>
-      <p><em>(In Notion: turn this into a comment thread or link to a WhatsApp group.)</em></p>
-      <div class="card" style="min-height:120px">Start the discussion here…</div>
-    </section>
+  <div class="splash" onclick="location.href='home/'">
+    <h1>Tap to Enter ✨</h1>
   </div>
-
-  <footer style="text-align:center;font-size:.8rem;padding:2rem 1rem;color:#666">© 2025 Jacob & Rosa’s Disney Planning Squad</footer>
 </body>
 </html>
