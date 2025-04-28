@@ -1,125 +1,117 @@
-/* priorities.js — cloud-save + tidy layout 23-05-2025 */
+/* priorities.js – v2 (overwrite row, header flex, auto-load) */
+const sheetURL =
+  'https://script.google.com/macros/s/AKfycbzcUxvfnsvzggOhK8e6VOoHKzZqgLqWwm8gtvzLqGJRBEBtA2wiAuCOhLeusRBRosii/exec';
 
-const WEB_APP_URL =
-  'https://script.google.com/macros/s/AKfycbymiX3sb_1odC7PhWFcKTlVO54t8RbNeUPvo6BS98VZDzG4hicVrXBJRrU-r2gcDZql/exec';
+const wrapper  = document.getElementById('people-lists');
+const addBtn   = document.getElementById('add-person');
+let   db = {};          // choices.json
 
-const top5Wrapper = document.getElementById('people-lists');
-const addBtn      = document.getElementById('add-person');
+/* ---------- load master choice DB once ---------- */
+fetch('../assets/choices.json').then(r=>r.json()).then(d=>{db=d; start();});
 
-let choiceDB = {};
+function start(){
+  loadExistingRows();            // pull Sheet rows → cards
+  addBtn.onclick = () => {
+    const name = prompt('Your name?'); if(!name) return;
+    if (document.querySelector(`[data-name="${name}"]`)) { alert('Name exists'); return; }
+    buildCard(name, []);         // fresh (empty) card
+  };
+}
 
-/* ---------- load master choices once ---------- */
-fetch('../assets/choices.json')
-  .then(r => r.json())
-  .then(data => { choiceDB = data; });
-
-/* ---------- add-person flow ---------- */
-addBtn.onclick = async () => {
-  const name = prompt('Enter your name:');
-  if (!name) return;
-  if (document.querySelector(`[data-name="${name}"]`)) {
-    alert('That name already exists!');
-    return;
-  }
-  createCard(name);
-};
-
-/* ---------- build one collapsible card ---------- */
-function createCard(name, savedChoices = []) {
-  const card = document.createElement('div');
+/* ---------- build one card ---------- */
+function buildCard(name, savedPairs){
+  const card   = document.createElement('div');
   card.className = 'card person-card';
   card.dataset.name = name;
 
-  /* header line */
-  const header = document.createElement('div');
-  header.className = 'card-header';
-  header.innerHTML = `<strong>${name}&apos;s Must-Dos</strong>`;
+  /* header (flex row) */
+  card.innerHTML = `
+    <div class="card-head">
+        <span class="title">${name}&apos;s Must-Dos</span>
+        <button class="remove">✖</button>
+    </div>
+    <div class="rows"></div>`;
+  card.querySelector('.remove').onclick = ()=>{ card.remove(); pushToSheet(name,true); };
 
-  const close = document.createElement('button');
-  close.className = 'remove-btn';
-  close.textContent = '✖';
-  close.onclick = () => { card.remove(); };
-  header.appendChild(close);
-  card.appendChild(header);
+  const rowsBox = card.querySelector('.rows');
 
-  /* collapsible body */
-  const body = document.createElement('div');
-  body.className = 'top5-form';
+  for(let i=0;i<5;i++){
+    const pair = savedPairs[i] || {};
+    const row  = document.createElement('div');
+    row.className='pair';
+    row.innerHTML = `
+        <select class="cat"></select>
+        <select class="att" disabled></select>`;
+    rowsBox.appendChild(row);
 
-  for (let i = 0; i < 5; i++) {
-    const row = document.createElement('div');
-    row.className = 'top5-row';
+    const catSel  = row.querySelector('.cat');
+    const attSel  = row.querySelector('.att');
 
-    const catSel   = document.createElement('select');
-    const itemSel  = document.createElement('select');
-    catSel.className  = 'cat';
-    itemSel.className = 'item';
-    catSel.innerHTML  = `<option value="">Category…</option>`;
-    Object.keys(choiceDB).forEach(cat => {
+    /* fill categories */
+    catSel.innerHTML = '<option value="">Category…</option>';
+    Object.keys(db).forEach(cat=>{
       catSel.innerHTML += `<option value="${cat}">${cat}</option>`;
     });
-    itemSel.innerHTML = `<option value="">Attraction…</option>`;
-    itemSel.disabled  = true;
 
-    /* populate second dropdown when category changes */
-    catSel.onchange = () => {
-      itemSel.innerHTML = `<option value="">Attraction…</option>`;
-      itemSel.disabled  = !choiceDB[catSel.value];
-      if (!itemSel.disabled) {
-        choiceDB[catSel.value].forEach(a=>{
-          itemSel.innerHTML += `<option value="${a}">${a}</option>`;
+    catSel.onchange = ()=>{
+      attSel.innerHTML = '<option value="">Attraction…</option>';
+      attSel.disabled  = !db[catSel.value];
+      if (!attSel.disabled){
+        db[catSel.value].forEach(a=>{
+          attSel.innerHTML += `<option value="${a}">${a}</option>`;
         });
       }
-      pushToSheet(name);           // save on every change
+      pushToSheet(name);
     };
-    itemSel.onchange = () => pushToSheet(name);
+    attSel.onchange = ()=> pushToSheet(name);
 
-    /* restore previously-saved selection */
-    if (savedChoices[i]) {
-      catSel.value = savedChoices[i].category;
-      catSel.onchange();           // populate items
-      setTimeout(()=>{ itemSel.value = savedChoices[i].attraction; }, 50);
+    /* restore saved */
+    if (pair.cat){
+      catSel.value = pair.cat;
+      catSel.onchange();
+      setTimeout(()=>{attSel.value = pair.att;},50);
     }
-
-    row.append(catSel, itemSel);
-    body.appendChild(row);
   }
-
-  card.appendChild(body);
-  top5Wrapper.appendChild(card);
+  wrapper.appendChild(card);
 }
 
-/* ---------- write a person’s 5 picks to Google Sheet ---------- */
-function pushToSheet(name) {
-  const card = document.querySelector(`[data-name="${name}"]`);
-  if (!card) return;
+/* ---------- send / delete row in sheet ---------- */
+function pushToSheet(name, remove=false){
+  // gather pairs
+  let c = Array.from(document.querySelectorAll(`[data-name="${name}"] .pair`))
+          .map(p=>{
+              const cat = p.querySelector('.cat').value || '';
+              const att = p.querySelector('.att').value || '';
+              return {cat,att};
+          });
 
-  const rows = [...card.querySelectorAll('.top5-row')];
-  const picks = rows.map(r=>r.querySelector('.item').value || '');
+  // build payload (empty strings if removed)
+  if(remove) c = [{}, {}, {}, {}, {}];
 
-  fetch(WEB_APP_URL, {
-    method: 'POST',
-    mode  : 'no-cors',            // !!! important for GitHub Pages
-    headers: { 'Content-Type':'application/json' },
-    body: JSON.stringify({
+  fetch(sheetURL, {
+    method:'POST', mode:'no-cors',
+    headers:{'Content-Type':'application/json'},
+    body:JSON.stringify({
       name,
-      choice1: picks[0],
-      choice2: picks[1],
-      choice3: picks[2],
-      choice4: picks[3],
-      choice5: picks[4]
+      c1:c[0].cat||'', a1:c[0].att||'',
+      c2:c[1].cat||'', a2:c[1].att||'',
+      c3:c[2].cat||'', a3:c[2].att||'',
+      c4:c[3].cat||'', a4:c[3].att||'',
+      c5:c[4].cat||'', a5:c[4].att||''
     })
-  }).then(()=> console.log(`Saved ${name} to sheet`));
-}
-
-/* ---------- (optional) pull existing sheet rows on load ---------- */
-async function loadSheetRows() {
-  const res  = await fetch(WEB_APP_URL);
-  const data = await res.json();          // [["Name","Choice1",…], …]
-  data.slice(1).forEach(row => {          // skip header row
-    const [ name, ...choices ] = row;
-    const saved = choices.map(c=>({category:'',attraction:c}));
-    createCard(name, saved);
   });
 }
-loadSheetRows();
+
+/* ---------- load rows from sheet on page load ---------- */
+async function loadExistingRows(){
+  const raw = await fetch(sheetURL).then(r=>r.json());
+  raw.slice(1).forEach(r=>{
+    const [name, ...cols] = r;
+    if(!name) return;
+    const pairs=[];
+    for(let i=0;i<10;i+=2){
+      pairs.push({cat:cols[i]||'', att:cols[i+1]||''});
+    }
+    buildCard(name, pairs);
+  });
+}
