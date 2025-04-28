@@ -91,6 +91,7 @@ function pushToSheet(name,remove=false){
 
   fetch(SHEET_URL,{
     method:'POST',
+    mode:'no-cors',
     headers:{'Content-Type':'application/json'},
     body:JSON.stringify({
       name,
@@ -105,7 +106,7 @@ function pushToSheet(name,remove=false){
 
 /* ---------- pull all rows, build cards ---------- */
 async function loadRowsFromSheet(){
-  const data=await fetch(SHEET_URL).then(r=>r.json());
+  const data = await fetch(SHEET_URL, {mode:'no-cors'}).then(r=>r.json());
   data.slice(1).forEach(r=>{
     const [name,...cols]=r;
     if(!name) return;
