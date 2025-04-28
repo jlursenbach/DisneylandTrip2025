@@ -152,3 +152,9 @@ body{
   background-color:#111417;
   background-blend-mode:overlay;
 }
+@media (prefers-color-scheme: dark){
+  .bar{fill:#4f9ef7!important;}       /* bar colour */
+  .bar-progress{fill:#e6232e!important;}
+  .grid-row, .grid-header{stroke:#333!important;}
+  .grid-header{background:#202225!important;}
+}
