@@ -105,15 +105,19 @@ function pushToSheet(name,remove=false){
 }
 
 /* ---------- pull all rows, build cards ---------- */
-async function loadRowsFromSheet(){
-  const data = await fetch(SHEET_URL).then(r=>r.json());
-  data.slice(1).forEach(r=>{
-    const [name,...cols]=r;
-    if(!name) return;
-    const pairs=[];
-    for(let i=0;i<10;i+=2){
-      pairs.push({cat:cols[i]||'',att:cols[i+1]||''});
+async function loadRowsFromSheet () {
+  const data = await fetch(SHEET_URL)
+      .then(r => r.text())              // get raw text first
+      .then(txt => txt ? JSON.parse(txt) : []);   // parse only if not empty
+
+  data.slice(1).forEach(row => {
+    const [name, ...cols] = row;
+    if (!name) return;
+
+    const pairs = [];
+    for (let i = 0; i < 10; i += 2) {
+      pairs.push({ cat: cols[i] || '', att: cols[i + 1] || '' });
     }
-    buildCard(name,pairs);
+    buildCard(name, pairs);
   });
 }
