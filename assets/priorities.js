@@ -1,132 +1,118 @@
-/* priorities.js – v2 (overwrite row, header flex, auto-load) */
-const sheetURL =
-  'https://script.google.com/macros/s/AKfycbzcUxvfnsvzggOhK8e6VOoHKzZqgLqWwm8gtvzLqGJRBEBtA2wiAuCOhLeusRBRosii/exec';
+/* priorities.js  – v3 cloud-sync */
+const SHEET_URL =
+  'hhttps://script.google.com/macros/s/AKfycbwhnFMy25zzRxDDvX1qKbVSIKbo2YoWtvawDYWrzthDd7v_hpsiEi99jP1qaknMktni/exec';
 
-const wrapper  = document.getElementById('people-lists');
-const addBtn   = document.getElementById('add-person');
-let   db = {};          // choices.json
+const wrapper = document.getElementById('people-lists');
+const addBtn  = document.getElementById('add-person');
+let choiceDB  = {};   // from choices.json
 
-/* ---------- load master choice DB once ---------- */
-fetch('../assets/choices.json').then(r=>r.json()).then(d=>{db=d; start();});
+/* 1️⃣  load master choices THEN load saved rows */
+fetch('../assets/choices.json')
+  .then(r=>r.json())
+  .then(db=>{
+      choiceDB=db;
+      loadRowsFromSheet();
+      addBtn.onclick = addPerson;
+  });
 
-function start(){
-  loadExistingRows();            // pull Sheet rows → cards
-  addBtn.onclick = () => {
-    const name = prompt('Your name?'); if(!name) return;
-    if (document.querySelector(`[data-name="${name}"]`)) { alert('Name exists'); return; }
-    buildCard(name, []);         // fresh (empty) card
-  };
-}
+/* ---------- card builder ---------- */
+function buildCard(name, pairs=[{},{},{},{},{}]){
+  const card = document.createElement('div');
+  card.className='card person-card';
+  card.dataset.name=name;
 
-/* ---------- build one collapsible card ---------- */
-function buildCard(name, savedPairs = []) {
+  card.innerHTML = `
+    <details open>
+      <summary>
+        <span class="title">${name}&apos;s Must-Dos</span>
+        <button class="remove">✖</button>
+      </summary>
+      <div class="top5-form"></div>
+    </details>`;
+  wrapper.appendChild(card);
 
-  // ── card shell
-  const card  = document.createElement('div');
-  card.className = 'card person-card';
-  card.dataset.name = name;
-
-  // ── <details> wrapper (built-in dropdown)
-  const details = document.createElement('details');
-  details.open = true;               // start open; remove if you want closed-by-default
-  card.appendChild(details);
-
-  // ── summary line (title + close button)
-  const summary = document.createElement('summary');
-  summary.innerHTML =
-      `<span class="title">${name}&apos;s Must-Dos</span>
-       <button class="remove" title="Remove">✖</button>`;
-  details.appendChild(summary);
-
-  // close-button handler
-  summary.querySelector('.remove').onclick = (e)=>{
-      e.stopPropagation();           // don’t toggle accordion
-      card.remove();                 // remove from DOM
-      pushToSheet(name,true);        // clear in sheet
+  card.querySelector('.remove').onclick=e=>{
+      e.stopPropagation();
+      card.remove(); pushToSheet(name, true);
   };
 
-  // ── body (flex column of 5 rows)
-  const body = document.createElement('div');
-  body.className = 'top5-form';
-  details.appendChild(body);
+  const form = card.querySelector('.top5-form');
 
-  for (let i=0; i<5; i++){
-    const pair = savedPairs[i] || {};
-    const row  = document.createElement('div');
-    row.className = 'pair';
+  for(let i=0;i<5;i++){
+    const row = document.createElement('div');
+    row.className='pair';
+    const catSel=document.createElement('select');
+    const attSel=document.createElement('select');
+    catSel.className='cat'; attSel.className='att'; attSel.disabled=true;
 
-    const catSel = document.createElement('select');
-    const attSel = document.createElement('select');
-    catSel.className='cat';  attSel.className='att';  attSel.disabled=true;
-
-    catSel.innerHTML = '<option value="">Category…</option>';
-    Object.keys(db).forEach(cat=>{
-      catSel.innerHTML += `<option value="${cat}">${cat}</option>`;
+    catSel.innerHTML='<option value="">Category…</option>';
+    Object.keys(choiceDB).forEach(cat=>{
+      catSel.innerHTML+=`<option value="${cat}">${cat}</option>`;
     });
 
-    catSel.onchange = ()=>{
-      attSel.innerHTML = '<option value="">Attraction…</option>';
-      attSel.disabled = !db[catSel.value];
-      if (!attSel.disabled){
-        db[catSel.value].forEach(a=>{
-          attSel.innerHTML += `<option value="${a}">${a}</option>`;
+    catSel.onchange=()=>{
+      attSel.innerHTML='<option value="">Attraction…</option>';
+      attSel.disabled=!choiceDB[catSel.value];
+      if(!attSel.disabled){
+        choiceDB[catSel.value].forEach(a=>{
+          attSel.innerHTML+=`<option value="${a}">${a}</option>`;
         });
       }
       pushToSheet(name);
     };
-    attSel.onchange = ()=> pushToSheet(name);
+    attSel.onchange=()=>pushToSheet(name);
 
-    /* restore previous choice */
-    if (pair.cat){
-      catSel.value = pair.cat;        // fire to fill attractions
+    /* restore saved */
+    if(pairs[i].cat){
+      catSel.value=pairs[i].cat;
       catSel.onchange();
-      setTimeout(()=>{attSel.value = pair.att;},50);
+      setTimeout(()=>{attSel.value=pairs[i].att;},50);
     }
-
-    row.append(catSel, attSel);
-    body.appendChild(row);
+    row.append(catSel,attSel); form.appendChild(row);
   }
-  wrapper.appendChild(card);
 }
 
+/* ---------- Add-Me handler ---------- */
+function addPerson(){
+  const name=prompt('Your name?'); if(!name) return;
+  if(document.querySelector(`[data-name="${name}"]`)){alert('Name exists');return;}
+  buildCard(name);
+}
 
-/* ---------- send / delete row in sheet ---------- */
-function pushToSheet(name, remove=false){
-  // gather pairs
-  let c = Array.from(document.querySelectorAll(`[data-name="${name}"] .pair`))
-          .map(p=>{
-              const cat = p.querySelector('.cat').value || '';
-              const att = p.querySelector('.att').value || '';
-              return {cat,att};
-          });
+/* ---------- push one person to Sheet ---------- */
+function pushToSheet(name,remove=false){
+  const rows=[...document.querySelectorAll(`[data-name="${name}"] .pair`)];
+  const pairs=rows.map(r=>{
+      const cat=r.querySelector('.cat').value||'';
+      const att=r.querySelector('.att').value||'';
+      return {cat,att};
+  });
+  if(remove) pairs.forEach(p=>{p.cat='';p.att='';});
 
-  // build payload (empty strings if removed)
-  if(remove) c = [{}, {}, {}, {}, {}];
-
-  fetch(sheetURL, {
-    method:'POST', mode:'no-cors',
+  fetch(SHEET_URL,{
+    method:'POST',
     headers:{'Content-Type':'application/json'},
     body:JSON.stringify({
       name,
-      c1:c[0].cat||'', a1:c[0].att||'',
-      c2:c[1].cat||'', a2:c[1].att||'',
-      c3:c[2].cat||'', a3:c[2].att||'',
-      c4:c[3].cat||'', a4:c[3].att||'',
-      c5:c[4].cat||'', a5:c[4].att||''
+      c1:pairs[0].cat, a1:pairs[0].att,
+      c2:pairs[1].cat, a2:pairs[1].att,
+      c3:pairs[2].cat, a3:pairs[2].att,
+      c4:pairs[3].cat, a4:pairs[3].att,
+      c5:pairs[4].cat, a5:pairs[4].att
     })
-  });
+  }).then(()=>console.log('Saved',name));
 }
 
-/* ---------- load rows from sheet on page load ---------- */
-async function loadExistingRows(){
-  const raw = await fetch(sheetURL).then(r=>r.json());
-  raw.slice(1).forEach(r=>{
-    const [name, ...cols] = r;
+/* ---------- pull all rows, build cards ---------- */
+async function loadRowsFromSheet(){
+  const data=await fetch(SHEET_URL).then(r=>r.json());
+  data.slice(1).forEach(r=>{
+    const [name,...cols]=r;
     if(!name) return;
     const pairs=[];
     for(let i=0;i<10;i+=2){
-      pairs.push({cat:cols[i]||'', att:cols[i+1]||''});
+      pairs.push({cat:cols[i]||'',att:cols[i+1]||''});
     }
-    buildCard(name, pairs);
+    buildCard(name,pairs);
   });
 }
