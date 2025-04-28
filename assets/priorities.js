@@ -3,7 +3,7 @@
 const top5Wrapper = document.getElementById('people-lists');
 let top5Lists = []; // no longer relying on localStorage — will POST to cloud
 
-const WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbwWWU4vrpkUSMP4zHWZy67D1kkcg87SQ8Qttuu5UaZA7qsHP7_RBsSJGGMT0JlwxuU9/exec'; // <<< REPLACE THIS with your real Web App URL
+const WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbymiX3sb_1odC7PhWFcKTlVO54t8RbNeUPvo6BS98VZDzG4hicVrXBJRrU-r2gcDZql/exec'; // <<< REPLACE THIS with your real Web App URL
 
 async function loadChoices() {
   const response = await fetch('../assets/choices.json');
