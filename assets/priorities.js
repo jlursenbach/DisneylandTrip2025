@@ -1,6 +1,6 @@
 /* priorities.js  – v3 cloud-sync */
 const SHEET_URL =
-  'https://script.google.com/macros/s/AKfycbwMeXuZY-wg8kU7vJkydMYHkRS_qaE4wQSFJAjyHsgd0KwuynY5staQrCFz6xFfcmfm/exec';
+  'https://script.google.com/macros/s/AKfycbzr02yoJokxYM6puUexZYDzvvS6nSAFsCHtXJ7cuEuudoAzxXwR6Q_5Oef2tdwEIvdo/exec';
 
 const wrapper = document.getElementById('people-lists');
 const addBtn  = document.getElementById('add-person');
