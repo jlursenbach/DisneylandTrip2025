@@ -74,6 +74,7 @@ section h2::after{
 /* ---------- Card shell ---------- */
 .card{
   background:var(--card);
+  isolation: isolate;
   border-radius:var(--radius);
   padding:1.2rem; box-shadow:var(--shadow);
   position:relative; overflow:hidden;
@@ -98,10 +99,21 @@ section h2::after{
 
 /* ---------- Top-5 card interior ---------- */
 .card-head{
-  display:flex; justify-content:space-between; align-items:center;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
   margin-bottom:.8rem;
 }
-.card-head .title{font-weight:600;}
+.card-head .title{
+  font-weight:600;
+  **flex:1;                /* takes full width between ▸ and ❌  */
+  text-align:center;       /* so the text is visually centred   */
+}
+
+details summary{           /* keep arrow + header inline */
+  list-style:none; cursor:pointer; outline:none;
+  display:flex; align-items:center;
+}
 
 .top5-form{display:flex; flex-direction:column; gap:.6rem; text-align:center;}
 .pair{display:flex; justify-content:center; gap:.5rem;}
