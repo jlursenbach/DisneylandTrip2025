@@ -125,3 +125,23 @@ body{
   background:url('../assets/disney_castle_happy.jpg') center/cover fixed no-repeat;
   background-color:#111417; background-blend-mode:overlay;
 }
+/* details arrow styling */
+details summary {
+  list-style:none; cursor:pointer; outline:none;
+  display:flex; justify-content:space-between; align-items:center;
+}
+details summary::-webkit-details-marker{display:none;}   /* hide default triangle */
+
+details[open] > summary::before,
+details:not([open]) > summary::before{
+  content:'▸';                     /* closed */
+  font-size:1.1rem; margin-right:.4rem; color:var(--accent);
+  transition:transform .25s;
+}
+details[open] > summary::before{   /* open */
+  transform:rotate(90deg);
+}
+
+/* keep title / remove button tidy */
+summary .title{font-weight:600;}
+summary .remove{margin-left:auto;}
