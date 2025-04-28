@@ -18,36 +18,47 @@ function start(){
   };
 }
 
-/* ---------- build one card ---------- */
-function buildCard(name, savedPairs){
-  const card   = document.createElement('div');
+/* ---------- build one collapsible card ---------- */
+function buildCard(name, savedPairs = []) {
+
+  // ── card shell
+  const card  = document.createElement('div');
   card.className = 'card person-card';
   card.dataset.name = name;
 
-  /* header (flex row) */
-  card.innerHTML = `
-    <div class="card-head">
-        <span class="title">${name}&apos;s Must-Dos</span>
-        <button class="remove">✖</button>
-    </div>
-    <div class="rows"></div>`;
-  card.querySelector('.remove').onclick = ()=>{ card.remove(); pushToSheet(name,true); };
+  // ── <details> wrapper (built-in dropdown)
+  const details = document.createElement('details');
+  details.open = true;               // start open; remove if you want closed-by-default
+  card.appendChild(details);
 
-  const rowsBox = card.querySelector('.rows');
+  // ── summary line (title + close button)
+  const summary = document.createElement('summary');
+  summary.innerHTML =
+      `<span class="title">${name}&apos;s Must-Dos</span>
+       <button class="remove" title="Remove">✖</button>`;
+  details.appendChild(summary);
 
-  for(let i=0;i<5;i++){
+  // close-button handler
+  summary.querySelector('.remove').onclick = (e)=>{
+      e.stopPropagation();           // don’t toggle accordion
+      card.remove();                 // remove from DOM
+      pushToSheet(name,true);        // clear in sheet
+  };
+
+  // ── body (flex column of 5 rows)
+  const body = document.createElement('div');
+  body.className = 'top5-form';
+  details.appendChild(body);
+
+  for (let i=0; i<5; i++){
     const pair = savedPairs[i] || {};
     const row  = document.createElement('div');
-    row.className='pair';
-    row.innerHTML = `
-        <select class="cat"></select>
-        <select class="att" disabled></select>`;
-    rowsBox.appendChild(row);
+    row.className = 'pair';
 
-    const catSel  = row.querySelector('.cat');
-    const attSel  = row.querySelector('.att');
+    const catSel = document.createElement('select');
+    const attSel = document.createElement('select');
+    catSel.className='cat';  attSel.className='att';  attSel.disabled=true;
 
-    /* fill categories */
     catSel.innerHTML = '<option value="">Category…</option>';
     Object.keys(db).forEach(cat=>{
       catSel.innerHTML += `<option value="${cat}">${cat}</option>`;
@@ -55,7 +66,7 @@ function buildCard(name, savedPairs){
 
     catSel.onchange = ()=>{
       attSel.innerHTML = '<option value="">Attraction…</option>';
-      attSel.disabled  = !db[catSel.value];
+      attSel.disabled = !db[catSel.value];
       if (!attSel.disabled){
         db[catSel.value].forEach(a=>{
           attSel.innerHTML += `<option value="${a}">${a}</option>`;
@@ -65,15 +76,19 @@ function buildCard(name, savedPairs){
     };
     attSel.onchange = ()=> pushToSheet(name);
 
-    /* restore saved */
+    /* restore previous choice */
     if (pair.cat){
-      catSel.value = pair.cat;
+      catSel.value = pair.cat;        // fire to fill attractions
       catSel.onchange();
       setTimeout(()=>{attSel.value = pair.att;},50);
     }
+
+    row.append(catSel, attSel);
+    body.appendChild(row);
   }
   wrapper.appendChild(card);
 }
+
 
 /* ---------- send / delete row in sheet ---------- */
 function pushToSheet(name, remove=false){
