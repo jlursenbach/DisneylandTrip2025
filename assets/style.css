@@ -175,3 +175,24 @@ body{
 .remove-btn:hover {
   color: #ff3333;
 }
+.card-header{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  margin-bottom:.8rem;
+}
+
+.top5-form{display:flex;flex-direction:column;gap:.6rem;text-align:center;}
+
+.top5-row select{
+  padding:.35rem .4rem;
+  border-radius:6px;
+  border:1px solid #ccc;
+  margin:0 .2rem;
+}
+
+.remove-btn{
+  background:none;border:none;
+  font-size:1.1rem;color:#ff6b6b;cursor:pointer;
+}
+.remove-btn:hover{color:#ff3a3a}
