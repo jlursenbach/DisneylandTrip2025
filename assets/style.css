@@ -1,10 +1,9 @@
-/* Disney Family Trip — master stylesheet 2025
-   (full file, May-2025) */
+/* Disney Family Trip — master stylesheet 2025  */
 
 /* ---------- Color & design tokens ---------- */
 :root{
-  --primary:      #e6232e;   /* Mickey red */
-  --accent:       #f9d23c;   /* Disney yellow */
+  --primary:      #e6232e;          /* Mickey red  */
+  --accent:       #f9d23c;          /* Disney yellow */
   --accent-dark:  #d9b32f;
   --bg:           #f9f9fb;
   --card:         #ffffff;
@@ -12,7 +11,7 @@
   --radius:       12px;
   --shadow:       0 4px 14px rgb(0 0 0 / .06);
 }
-@media(prefers-color-scheme:dark){
+@media (prefers-color-scheme: dark){
   :root{
     --bg:      #111417;
     --card:    #1d2024;
@@ -59,101 +58,97 @@ a:hover{color:var(--accent-dark);}
 .main-nav a:hover{color:var(--accent-dark);}
 
 /* ---------- Layout helpers ---------- */
-.container{max-width:1000px; margin:2.5rem auto; padding:0 1rem;}
+.container{max-width:1000px;margin:2.5rem auto;padding:0 1rem;}
 section{margin:3rem 0;}
 section h2{
-  font-size:1.7rem; margin-bottom:1rem; font-weight:700; position:relative;
+  font-size:1.7rem;margin-bottom:1rem;font-weight:700;position:relative;
 }
 section h2::after{
-  content:""; display:block; width:64px; height:3px;
-  background:var(--accent); margin-top:.5rem; border-radius:3px;
+  content:"";display:block;width:64px;height:3px;
+  background:var(--accent);margin-top:.5rem;border-radius:3px;
 }
 .text-center{text-align:center;}
 .mt-1{margin-top:1rem;}
 
-/* ---------- Card shell ---------- */
+/* ---------- Universal card shell ---------- */
 .card{
   background:var(--card);
-  isolation: isolate;
+  isolation:isolate;          /* protect from body blend-mode in Safari */
   border-radius:var(--radius);
-  padding:1.2rem; box-shadow:var(--shadow);
-  position:relative; overflow:hidden;
-  transition:transform .3s,box-shadow .3s;
+  padding:1.2rem;
+  box-shadow:var(--shadow);
+  position:relative;
+  overflow:hidden;
+  transition:transform .3s, box-shadow .3s;
+  max-width:320px;            /* keep reasonable on desktop */
+  flex:1 1 280px;             /* responsive flex-grid sizing */
 }
-.card:hover{transform:translateY(-6px) scale(1.02);
-            box-shadow:0 8px 20px rgba(255,255,255,.12);}
-.card::after{           /* sparkle hover */
-  content:'✨'; position:absolute; top:-12px; right:-12px;
-  font-size:1.9rem; color:var(--accent);
-  opacity:0; pointer-events:none;
+.card:hover{
+  transform:translateY(-6px) scale(1.02);
+  box-shadow:0 8px 20px rgba(255,255,255,.12);
+}
+/* sparkle hover */
+.card::after{
+  content:'✨';position:absolute;top:-12px;right:-12px;
+  font-size:1.9rem;color:var(--accent);opacity:0;pointer-events:none;
   transform:rotate(10deg) scale(.8);
   transition:opacity .5s ease,transform .5s ease;
   animation:sparkle-move 2.5s infinite alternate ease-in-out;
 }
-.card:hover::after{opacity:1; transform:rotate(0) scale(1.15);}
+.card:hover::after{opacity:1;transform:rotate(0) scale(1.15);}
 @keyframes sparkle-move{
-  0%  {top:-12px;right:-12px;transform:rotate(0)   scale(.85);}
-  50% {top:-16px;right:-8px; transform:rotate(18deg)scale(1);}
-  100%{top:-12px;right:-6px; transform:rotate(-10deg)scale(.9);}
+  0%{top:-12px;right:-12px;transform:rotate(0) scale(.85);}
+  50%{top:-16px;right:-8px; transform:rotate(18deg) scale(1);}
+ 100%{top:-12px;right:-6px; transform:rotate(-10deg) scale(.9);}
+}
+
+/* ---------- Flex grid for home quick-links ---------- */
+.grid{
+  display:flex; flex-wrap:wrap;
+  justify-content:center; gap:1rem;
 }
 
 /* ---------- Top-5 card interior ---------- */
 .card-head{
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
+  display:flex; align-items:center; justify-content:space-between;
   margin-bottom:.8rem;
 }
 .card-head .title{
   font-weight:600;
-  **flex:1;                /* takes full width between ▸ and ❌  */
-  text-align:center;       /* so the text is visually centred   */
+  flex:1; text-align:center;         /* centred between ▸ and ❌ */
 }
-
-details summary{           /* keep arrow + header inline */
-  list-style:none; cursor:pointer; outline:none;
-  display:flex; align-items:center;
-}
-
-.top5-form{display:flex; flex-direction:column; gap:.6rem; text-align:center;}
-.pair{display:flex; justify-content:center; gap:.5rem;}
+.top5-form{display:flex;flex-direction:column;gap:.6rem;text-align:center;}
+.pair{display:flex;justify-content:center;gap:.5rem;}
 .pair select{
-  padding:.35rem .4rem; border-radius:6px;
-  border:1px solid #ccc; font-size:.88rem; min-width:180px;
+  padding:.35rem .4rem;border-radius:6px;
+  border:1px solid #ccc;font-size:.88rem;min-width:160px;
 }
 @media(prefers-color-scheme:dark){
-  .pair select{background:#2b2d31; border:1px solid #444; color:#eee;}
+  .pair select{background:#2b2d31;border:1px solid #444;color:#eee;}
 }
 
 /* remove-card button */
 .remove{
-  background:none; border:none; font-size:1rem; cursor:pointer;
-  color:#ff6b6b; padding:.2rem .4rem;
+  background:none;border:none;font-size:1rem;cursor:pointer;
+  color:#ff6b6b;padding:.2rem .4rem;
 }
 .remove:hover{color:#ff3131;}
+
+/* ---------- details / accordion styling ---------- */
+details summary{
+  list-style:none;cursor:pointer;outline:none;
+  display:flex;align-items:center;
+}
+details summary::-webkit-details-marker{display:none;}
+details summary::before{
+  content:'▸';font-size:1.1rem;margin-right:.4rem;color:var(--accent);
+  transition:transform .25s;
+}
+details[open] > summary::before{transform:rotate(90deg);}
 
 /* ---------- Magical page background ---------- */
 body{
   background:url('../assets/disney_castle_happy.jpg') center/cover fixed no-repeat;
-  background-color:#111417; background-blend-mode:overlay;
+  background-color:#111417;
+  background-blend-mode:overlay;
 }
-/* details arrow styling */
-details summary {
-  list-style:none; cursor:pointer; outline:none;
-  display:flex; justify-content:space-between; align-items:center;
-}
-details summary::-webkit-details-marker{display:none;}   /* hide default triangle */
-
-details[open] > summary::before,
-details:not([open]) > summary::before{
-  content:'▸';                     /* closed */
-  font-size:1.1rem; margin-right:.4rem; color:var(--accent);
-  transition:transform .25s;
-}
-details[open] > summary::before{   /* open */
-  transform:rotate(90deg);
-}
-
-/* keep title / remove button tidy */
-summary .title{font-weight:600;}
-summary .remove{margin-left:auto;}
