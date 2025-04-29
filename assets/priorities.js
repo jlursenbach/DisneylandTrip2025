@@ -105,14 +105,27 @@ function pushToSheet(name,remove=false){
 }
 
 /* ---------- pull all rows, build cards ---------- */
-async function loadRowsFromSheet(){
-  const data = await fetch(SHEET_URL, {
-                  method:'POST',
-                  mode:'no-cors',                   // no pre-flight
-                  headers:{'Content-Type':'application/json'},
-                  body: JSON.stringify({action:'read'})
-               }).then(r=>r.text())
-               .then(txt => txt ? JSON.parse(txt) : []);
+/* ---------- pull all rows, build cards ---------- */
+async function loadRowsFromSheet () {
 
-  /* …build cards as before… */
+  const data = await fetch(SHEET_URL, {
+        method : 'POST',
+        mode   : 'no-cors',                    // ← no CORS pre-flight
+        headers: { 'Content-Type':'application/json' },
+        body   : JSON.stringify({ action:'read' })
+      })
+      .then(r => r.text())                    // opaque → get raw text
+      .then(txt => txt ? JSON.parse(txt) : []);   // parse only if non-empty
+
+  /* build each person card from the rows */
+  data.slice(1).forEach(row => {
+    const [name, ...cols] = row;
+    if (!name) return;
+
+    const pairs = [];
+    for (let i = 0; i < 10; i += 2) {
+      pairs.push({ cat: cols[i] || '', att: cols[i + 1] || '' });
+    }
+    buildCard(name, pairs);
+  });
 }
