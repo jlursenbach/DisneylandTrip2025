@@ -105,27 +105,33 @@ function pushToSheet(name,remove=false){
 }
 
 /* ---------- pull all rows, build cards ---------- */
-/* ---------- pull all rows, build cards ---------- */
-async function loadRowsFromSheet () {
-
-  const data = await fetch(SHEET_URL, {
-        method : 'POST',
-        mode   : 'no-cors',                    // ← no CORS pre-flight
+async function loadRowsFromSheet(){
+  const raw = await fetch(SHEET_URL, {
+        method: 'POST',
+        mode: 'no-cors',
         headers: { 'Content-Type':'application/json' },
-        body   : JSON.stringify({ action:'read' })
+        body: JSON.stringify({ action: 'read' })
       })
-      .then(r => r.text())                    // opaque → get raw text
-      .then(txt => txt ? JSON.parse(txt) : []);   // parse only if non-empty
+      .then(r => r.text())
+      .then(txt => { console.log('RAW response:', txt); return txt ? JSON.parse(txt) : []; });
 
-  /* build each person card from the rows */
-  data.slice(1).forEach(row => {
+  console.log('Parsed sheet rows:', raw);
+
+  raw.slice(1).forEach((row, i) => {
+    console.log(`Building card #${i}`, row);
     const [name, ...cols] = row;
-    if (!name) return;
+    if (!name) {
+      console.warn('Skipping empty row', i);
+      return;
+    }
 
     const pairs = [];
-    for (let i = 0; i < 10; i += 2) {
-      pairs.push({ cat: cols[i] || '', att: cols[i + 1] || '' });
+    for (let j = 0; j < 10; j += 2) {
+      pairs.push({ cat: cols[j] || '', att: cols[j+1] || '' });
     }
+    buildCard(name, pairs);
+  });
+}
     buildCard(name, pairs);
   });
 }
