@@ -1,10 +1,8 @@
-/* priorities.js  – v3 cloud-sync */
-const SHEET_URL =
-  'https://script.google.com/macros/s/AKfycbyGwDNbFt4S4kPCMFMWK0-ewhPyN3rZi6S2HBGatEoFSjmKZM33zy7jCE-cyOQjU1Zt/exec';
-
+/* priorities.js  – v3 cloud-sync  →  v5 Google Apps Script */
 const wrapper = document.getElementById('people-lists');
 const addBtn  = document.getElementById('add-person');
 let choiceDB  = {};   // from choices.json
+const SHEET_URL = 'https://script.google.com/macros/s/AKfycbxpaNwUyiuDmP5Jy_mZrB-RRuW7FTJDlJyhSQW9km7Eowh_VZb7GFsRCCGgbp2h8uz-/exec'; // Replace with your actual URL
 
 /* 1️⃣  load master choices THEN load saved rows */
 fetch('../assets/choices.json')
@@ -79,8 +77,40 @@ function addPerson(){
   buildCard(name);
 }
 
+/* ---------- pull all rows, build cards ---------- */
+async function loadRowsFromSheet(){
+  try {
+    const response = await fetch(SHEET_URL, {
+      method: 'GET', // Or 'POST' with { action: 'read' } in the body
+      headers: { 'Content-Type': 'application/json' },
+    });
+    const data = await response.json();
+
+    if (data.status === 'ok') {
+      const raw = data.data;
+      raw.slice(1).forEach((row, i) => {
+        const [name, ...cols] = row;
+        if (!name) return;
+
+        const pairs = [];
+        for (let j = 0; j < 10; j += 2) {
+          pairs.push({ cat: cols[j] || '', att: cols[j+1] || '' });
+        }
+        buildCard(name, pairs);
+      });
+      console.log('Loaded from Sheet successfully');
+    } else {
+      console.error('Error loading from Sheet:', data.error);
+      alert('Error loading data. Please try again.');
+    }
+  } catch (error) {
+    console.error('Error connecting to Sheet:', error);
+    alert('Error connecting to the server. Please check your internet connection.');
+  }
+}
+
 /* ---------- push one person to Sheet ---------- */
-function pushToSheet(name,remove=false){
+function pushToSheet(name, remove=false){
   const rows=[...document.querySelectorAll(`[data-name="${name}"] .pair`)];
   const pairs=rows.map(r=>{
       const cat=r.querySelector('.cat').value||'';
@@ -91,47 +121,27 @@ function pushToSheet(name,remove=false){
 
   fetch(SHEET_URL,{
     method:'POST',
-    mode:'no-cors',
     headers:{'Content-Type':'application/json'},
     body:JSON.stringify({
       name,
       c1:pairs[0].cat, a1:pairs[0].att,
       c2:pairs[1].cat, a2:pairs[1].att,
-      c3:pairs[2].cat, a3:pairs[2].att,
-      c4:pairs[3].cat, a4:pairs[3].att,
-      c5:pairs[4].cat, a5:pairs[4].att
+      c3:pairs[2].cat, a3:pairs[3].att,
+      c4:pairs[4].cat, a4:pairs[4].att,
+      c5:pairs[5].cat, a5:pairs[5].att
     })
-  }).then(()=>console.log('Saved',name));
-}
-
-/* ---------- pull all rows, build cards ---------- */
-async function loadRowsFromSheet(){
-  const raw = await fetch(SHEET_URL, {
-        method: 'POST',
-        mode: 'no-cors',
-        headers: { 'Content-Type':'application/json' },
-        body: JSON.stringify({ action: 'read' })
-      })
-      .then(r => r.text())
-      .then(txt => { console.log('RAW response:', txt); return txt ? JSON.parse(txt) : []; });
-
-  console.log('Parsed sheet rows:', raw);
-
-  raw.slice(1).forEach((row, i) => {
-    console.log(`Building card #${i}`, row);
-    const [name, ...cols] = row;
-    if (!name) {
-      console.warn('Skipping empty row', i);
-      return;
+  })
+  .then(response => response.json())
+  .then(data => {
+    if (data.status === 'ok') {
+      console.log('Saved to Sheet:', name);
+    } else {
+      console.error('Error saving to Sheet:', data.error);
+      alert('Error saving data. Please try again.');
     }
-
-    const pairs = [];
-    for (let j = 0; j < 10; j += 2) {
-      pairs.push({ cat: cols[j] || '', att: cols[j+1] || '' });
-    }
-    buildCard(name, pairs);
-  });
-}
-    buildCard(name, pairs);
+  })
+  .catch(error => {
+    console.error('Error connecting to Sheet:', error);
+    alert('Error connecting to the server. Please check your internet connection.');
   });
 }
